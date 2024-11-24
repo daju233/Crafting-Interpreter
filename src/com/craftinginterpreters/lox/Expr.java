@@ -22,6 +22,7 @@ abstract class Expr {
 
         @Override
         <R> R accept(Visitor<R> visitor) {
+            System.out.println(this);//这里的this是binary
             return visitor.visitBinaryExpr(this);
         }
 
