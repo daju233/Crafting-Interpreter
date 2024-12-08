@@ -30,11 +30,11 @@ class Parser {
     }
 
     /*
-    * 我们希望语法树能够反映出左值不会像常规表达式那样计算。
-    * 这也是为什么 Expr.Assign 节点的左侧是一个 Token，而不是 Expr。
-    * 问题在于，解析器直到遇到等号“=”才知道正 在解析一个左值。
-    * 在一个复杂的左值中，可能在出现很多标记之后才能识别到。
-    * */
+     * 我们希望语法树能够反映出左值不会像常规表达式那样计算。
+     * 这也是为什么 Expr.Assign 节点的左侧是一个 Token，而不是 Expr。
+     * 问题在于，解析器直到遇到等号“=”才知道正 在解析一个左值。
+     * 在一个复杂的左值中，可能在出现很多标记之后才能识别到。
+     * */
     //赋值 a=b
     private Expr assignment() {
         Expr expr = equality();//左边的表达式
@@ -63,6 +63,7 @@ class Parser {
 
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
 
@@ -85,7 +86,22 @@ class Parser {
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
+        //挑战：REPL 不再支持输入一个表达式并自动打印其结果值。这是个累赘。
+        // 在 REPL 中增 加支持，让用户既可以输入语句又可以输入表达式。
+        // 如果他们输入一个语句，就执 行它。如果他们输入一个表达式，则对表达式求值并显示结果值。
+//        if(peek()==null){
+//            System.out.println(new Stmt.Expression(expr));
+//        }
         return new Stmt.Expression(expr);
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
     }
 
     //二元表达式 a==b
@@ -108,6 +124,7 @@ class Parser {
         }
         return false;
     }
+
     //比较式
     private Expr comparison() {
         Expr expr = term();

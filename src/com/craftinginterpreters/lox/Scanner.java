@@ -126,6 +126,7 @@ class Scanner {
     private void string() {
         while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
+            advance();//忘了加消费，差点出事
         }
         if (isAtEnd()) {
             Lox.error(line, "Unterminated string.");
