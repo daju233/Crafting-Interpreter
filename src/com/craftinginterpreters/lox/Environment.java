@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class Environment {
-    final Environment enclosing;
+    final Environment enclosing;//外围环境
     private final Map<String, Object> values = new HashMap<>();
 
     Environment() {
